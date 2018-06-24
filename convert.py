@@ -18,6 +18,13 @@ def isSame(line):
     
     
 def getWords(line):
+    end = len(line)
+    for i in xrange(len(line)):
+        if line[i] == ' ' or line[i] == '\t':
+            end = i
+            break
+
+    line = line[:end]
     if isSame(line):
         line = line[:1]
         
@@ -41,31 +48,51 @@ def convert(input, output):
 
 def checkDup(input):
     output = ''
-    last = ''
+    traditional = ''
+    simplified = ''
     with codecs.open(input, 'r', encoding='utf8') as fi:
         s = Set()
+        record = False
         for line in fi:
             line = line.strip()
+            if line == "":
+                record = True
             output = output + line + '\n'
             for c in line:
                 if c not in s:
-                    last = last + c
+                    if record:
+                        simplified = simplified + c
+                    else:
+                        traditional = traditional + c
                     s.add(c)
 
     with codecs.open(input, 'w', encoding='utf8') as fo:
         fo.write('%s' % output)
-        fo.write('%s' % last)
-
-    
+        fo.write('%s\n' % traditional)
+        fo.write('%s\n' % simplified)
         
-
+def normalise(input, length):
+    output = ''
+    last = ''
+    with codecs.open(input, 'r', encoding='utf8') as fi:
+        for line in fi:
+            line = line.strip()
+            while len(line) < length:
+                line = line + ' '
+            output = output + line + '\n'                      
                    
+    with codecs.open(input, 'w', encoding='utf8') as fo:
+        fo.write('%s' % output)
+
             
-            
-# python convert.py wordlist/hsk2-words.txt wordlist/hsk2-list.txt
+# python convert.py wordlist/coursera-hsk1-peking/week1.txt wordlist/coursera-hsk1-peking/week1-input.txt
 if __name__ == "__main__":
-    # convert(wordlist/hsk2-words.txt, wordlist/hsk2-list.txt)
+    #convert('wordlist/coursera-hsk1-peking/week2.txt', 'wordlist/coursera-hsk1-peking/week2-input.txt')
+    #exit(0)
     if sys.argv[1] == 'convert':
         convert(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == 'check':
         checkDup(sys.argv[2])
+    elif sys.argv[1] == 'normalise':
+        normalise(sys.argv[2], int(sys.argv[3]))
+ 
